@@ -1,0 +1,108 @@
+  /* Remove margens e define fonte base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Tela inicial e containers gerais */
+    body, html {
+      height: 100%; /* Ocupa toda altura da tela */
+      background-color: #1a1a1a; /* Fundo escuro tipo app */
+      color: #fff; /* Texto branco para contraste */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px; /* Espaço interno para evitar que fique colado nas bordas */
+    }
+
+    /* Estilo da tela inicial */
+    .tela-inicial {
+      text-align: center;
+      width: 100%;
+    }
+
+    .titulo {
+      font-size: 2rem; /* Aproximadamente 32px */
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background-color: #00c853; /* Verde vibrante */
+      color: white;
+      border: none;
+      padding: 12px 24px; /* 12px vertical e 24px horizontal */
+      font-size: 1rem; /* Aproximadamente 16px */
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #00e676; /* Verde claro ao passar o mouse */
+    }
+
+    /* Container principal do quiz */
+    .container {
+      width: 100%;
+    }
+
+    .questions-container {
+    background-color: #2a2a2a; /* Cinza escuro */
+    padding: 20px;
+    border-radius: 16px;
+    /*0 4px 12px: deslocamento horizontal 0, vertical 4px, desfoque 12px */
+    box-shadow: 0 0 12px rgba(138, 43, 226, 0.6); /* BlueViolet */
+    /*rgba(0, 0, 0, 0.4): cor preta com 40% de opacidade — cria um efeito sutil sem exagerar*/
+    } 
+
+
+
+
+    .question {
+      font-size: 1.2rem; /* Aproximadamente 19px */
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .answers-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .answers {
+      background-color: #424242; /* Botões escuros */
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem; /* 16px */
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .answers:hover {
+      background-color: #616161;
+    }
+
+    .modal {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+       position: fixed;
+       top: 50%;
+       left: 50%;
+       transform: translate(-50%, -50%);
+       background-color: #00c853;
+       padding: 2rem;
+       border-radius: 12px;
+       box-shadow: 0 8px 16px rgba(138, 43, 226, 0.6);
+       z-index: 1000;
+       width: 90%;
+       max-width: 400px;
+    }
+
+    
+ 
