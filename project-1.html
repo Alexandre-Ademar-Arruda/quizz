@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>I<iss-ssi>I</title>
+</head>
+<body>
+    <script>
+        let questions = [
+            { 
+                question : 'Quem descobriu o Brasil?', 
+                answer : {
+                    A: 'Pedro Alvares Cabral', 
+                    B: 'Cristovao Colombo', 
+                    C: 'Roberto Carlos', 
+                    D: 'Luis Inacio '
+                },
+                correctAnswer: 'A'
+            },
+            {
+                question: 'Qual a capital da França',
+                answer: {
+                    A: 'Berlin',
+                    B: 'Madri',
+                    C: 'Paris',
+                    D: 'Moscou'
+                },
+                correctAnswer: 'C'
+            }
+        ]; 
+        
+        let atual = 0;
+        let acertou = 0;
+        let errou = 0;
+        
+        function criarElemento(tipo,classe,conteudo) {
+            const elemento = document.createElement(tipo);
+            if (tipo === 'input') {
+                elemento.placeholder = conteudo;
+            } else {
+                elemento.textContent = conteudo;
+            }
+            if (classe )
+                elemento.className = classe;
+            return elemento;
+        }
+    
+    //criando div telaInicial onde teremos a inserçao dos elementos e ja inserindo no body
+    const telaInicial = criarElemento('div','tela-inicial','');
+    document.body.appendChild(telaInicial);
+    
+    const botaoComecar = criarElemento('button','btn','Começar Quiz!');
+    telaInicial.appendChild(botaoComecar);
+    
+    botaoComecar.addEventListener('click', () => { 
+        botaoComecar.remove();
+
+        const titulo = criarElemento('h1','titulo','I<iss ssi>I');
+        telaInicial.appendChild(titulo);
+                
+        //criando a divQuestions onde aparecera as perguntas com as respostas e ja inserindo dentro da telaInicial
+        const divQuestions = criarElemento('div','questions-container','');
+        telaInicial.appendChild(divQuestions);
+       
+        //criando o span e ja inserindo dentro da div question
+        const spanQuestion = criarElemento('span','question','');
+        divQuestions.appendChild(spanQuestion);
+        
+        //criando a div das resposta, os botoes das alternativas e inserido-os na divQuestions
+        //criando os buttons que serao as alternativas e ja inserir eles na divAnswers que contera as alternativas
+        const divAnswers = criarElemento('div','answers-container','');
+        divQuestions.appendChild(divAnswers);
+        
+        
+        function carregarPergunta() {
+
+            telaInicial.appendChild(divQuestions);
+
+
+            if (atual === questions.length) {
+                
+                spanQuestion.textContent = '🎉 Fim do quiz!';
+                
+                divAnswers.innerHTML='';
+                
+                finishKiss();
+                
+                return;
+
+            }
+
+            function finishKiss(){
+                
+                const totalQuestion = questions.length;
+                
+                const desempenho = Math.floor( acertou * 100 / totalQuestion);
+
+                let menssagem = "";
+                
+                switch(true) {
+                    
+                    case ( desempenho >= 90 ): 
+                        menssagem = 'Excelente :)';
+                        break;
+                    case ( desempenho >= 70 ):
+                        menssagem = 'Muito Bom ;)';
+                        break;
+                    case ( desempenho >= 50 ):
+                        menssagem = 'Medio';
+                        break;
+                    default:
+                        menssagem = 'Precisa Melhorar';
+                }
+
+                const resultado = criarElemento('p','resultado',`Voce acertou ${acertou} de  ${totalQuestion} (${desempenho}%). ${menssagem}`);
+
+                divAnswers.appendChild(resultado);
+                
+                const reiniciar = criarElemento('button','btn','Reiniciar');
+
+                divAnswers.appendChild(reiniciar);
+
+                reiniciar.addEventListener('click', () => {
+                    atual = 0;
+                    acertou = 0;
+                    errou = 0;
+                    divAnswers.innerHTML='';
+                    carregarPergunta();
+                })
+
+                const inserirPergunta = criarElemento('button','btn','Inserir Pergunta');
+
+                divAnswers.appendChild(inserirPergunta);
+
+                inserirPergunta.addEventListener('click', () => {
+
+                    divQuestions.remove();
+                    
+                    const modal = criarElemento('div','modal','');
+
+                    document.body.appendChild(modal);
+                    
+                    const titulo = criarElemento('h2','','Inserir Nova Pergunta' );
+
+                    modal.appendChild(titulo);
+
+                    const letras = ['A','B','C','D'];
+                    
+                    const alternativa = {};
+
+                    const pergunta = criarElemento('input','','Digite a pergunta');
+
+                    modal.appendChild(pergunta);
+
+                    letras.forEach( (letra) => {
+                        
+                        alternativa[letra] = criarElemento('input','alternativa',`Resposta ${letra}`);
+                        
+                        modal.appendChild(alternativa[letra]);
+                        
+                    })
+
+                    const alternativaCorreta = criarElemento('input','','Resposta correta (A, B, C ou D)');
+
+                    modal.appendChild(alternativaCorreta);
+
+                    const botaoSalvar = criarElemento('button','btn','Salvar');
+
+                    modal.appendChild(botaoSalvar);
+                    
+                    botaoSalvar.addEventListener('click', () => {
+                        
+                        const objetoResposta = {};
+    
+                        letras.forEach( (letra) => {
+                            
+                            objetoResposta[letra] = alternativa[letra].value;
+                            
+                        });
+                        
+                    
+
+                        fetch('http://localhost:3000/adicionar-pergunta', { 
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }, 
+                            body: JSON.stringify( {
+                                pergunta: pergunta.value,
+                                alternativas: objetoResposta,
+                                respostaCorreta: alternativaCorreta.value.toUpperCase()
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            alert(data.mensagem);
+                            modal.remove();
+                            atual = 0;
+                            acertou = 0;
+                            errou = 0;
+                            carregarPergunta();
+                        })
+                        
+                    });
+                   
+                })
+
+            }
+            
+            const perguntaAtual = questions[atual];
+
+            spanQuestion.textContent = perguntaAtual.question;
+
+            divAnswers.innerHTML='';
+            
+            const letras = ['A', 'B', 'C', 'D'];
+            
+            letras.forEach((letra) => {
+                const texto = `${letra}: ${perguntaAtual.answer[letra]}`;
+                const botao = criarElemento('button','answers button', texto);
+                botao.dataset.answer = letra;
+                divAnswers.appendChild(botao);
+
+                botao.addEventListener('click', () => {
+                    if (letra === perguntaAtual.correctAnswer) {
+                        alert('✅ Resposta correta!');
+                        acertou++;
+                    } else {
+                        alert('❌ Resposta errada!');
+                        errou++;
+                    }
+                    atual++;
+                    carregarPergunta();
+                });
+            });
+        }
+
+        carregarPergunta();
+            
+    });
+        //const divConstrolsContainer = criarElemento('div','constrols-container','');
+        //const botaoNextQuestion = criarElemento('button','next-question button', 'Proxima Pergunta');
+  
+    </script>
+</body>
+</html>
