@@ -4,11 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>Quiss</title>
 </head>
 <body>
-    <script type="module">
-        import {criarElemento} from './criarElemento.js';
+    <script>
+        // Função para criar elementos HTML dinamicamente
+
+        function criarElemento(tipo,classe,conteudo,atributos={}) {
+
+        const elemento = document.createElement(tipo); // Cria elemento do tipo passado
+
+        if (classe) elemento.className = classe; // Define a classe CSS se existir
+
+        if (conteudo) {
+
+            if (tipo === 'input' || tipo === 'textarea') {
+
+                elemento.value = conteudo;
+
+            } else {
+
+                elemento.textContent = conteudo; // Caso contrário, texto interno do elemento
+
+            }
+
+        }
+        
+        for (let chave in atributos) {
+
+            elemento.setAttribute(chave, atributos[chave]);
+
+        }
+
+        return elemento; // Retorna o elemento criado
+
+    }
+
+       //import {criarElemento} from './criarElemento.js';
 
             let questions = [
             { 
@@ -72,7 +104,9 @@
             // Função para carregar perguntas do backend e iniciar o quiz
             function carregarPergunta() {
                 // Fetch das perguntas do backend via GET /perguntas
-                fetch('http://localhost:3000/perguntas')
+                fetch('https://quiss.onrender.com/perguntas')
+
+//                fetch('http://localhost:3000/perguntas')
                 .then(res => res.json()) // Converte resposta para JSON
                 .then(data => {
                     // Mapeia dados do banco para o formato esperado pelo quiz
