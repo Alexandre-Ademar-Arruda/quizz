@@ -1,0 +1,243 @@
+import { criarElemento } from "./criarElemento";
+// Inicializa lista de perguntas com perguntas estáticas (vai ser substituída ao carregar do backend)
+let questions = [
+    { 
+        question : 'Quem descobriu o Brasil?', 
+        answer : {
+            A: 'Pedro Alvares Cabral', 
+            B: 'Cristovao Colombo', 
+            C: 'Roberto Carlos', 
+            D: 'Luis Inacio '
+        },
+        correctAnswer: 'A'
+    },
+    {
+        question: 'Qual a capital da França',
+        answer: {
+            A: 'Berlin',
+            B: 'Madri',
+            C: 'Paris',
+            D: 'Moscou'
+        },
+        correctAnswer: 'C'
+    }
+]; 
+
+let atual = 0;   // Índice da pergunta atual
+let acertou = 0; // Contador de acertos
+let errou = 0;   // Contador de erros
+
+// Função para criar elementos HTML dinamicamente
+function criarElemento(tipo,classe,conteudo) {
+    const elemento = document.createElement(tipo); // Cria elemento do tipo passado
+    if (tipo === 'input') {
+        elemento.placeholder = conteudo; // Se input, placeholder recebe o texto
+    } else {
+        elemento.textContent = conteudo; // Caso contrário, texto interno do elemento
+    }
+    if (classe)
+        elemento.className = classe; // Define a classe CSS se existir
+    return elemento; // Retorna o elemento criado
+}
+
+// Cria div principal da tela inicial e insere no body
+const telaInicial = criarElemento('div','tela-inicial','');
+document.body.appendChild(telaInicial);
+
+// Cria botão para iniciar quiz e adiciona à tela inicial
+const botaoComecar = criarElemento('button','btn','Começar Quiz!');
+telaInicial.appendChild(botaoComecar);
+
+// Evento para começar o quiz quando o botão for clicado
+botaoComecar.addEventListener('click', () => { 
+    botaoComecar.remove(); // Remove o botão iniciar para dar lugar ao quiz
+
+    const titulo = criarElemento('h1','titulo','I<iss ssi>I');
+    telaInicial.appendChild(titulo);
+            
+    // Cria container para as perguntas e respostas e adiciona à tela inicial
+    const divQuestions = criarElemento('div','questions-container','');
+    telaInicial.appendChild(divQuestions);
+    
+    // Cria span para exibir o texto da pergunta
+    const spanQuestion = criarElemento('span','question','');
+    divQuestions.appendChild(spanQuestion);
+    
+    // Cria container para as alternativas (botões) e adiciona dentro de divQuestions
+    const divAnswers = criarElemento('div','answers-container','');
+    divQuestions.appendChild(divAnswers);
+    
+    // ** ALTERAÇÃO PRINCIPAL **
+    // Função para carregar perguntas do backend e iniciar o quiz
+    function carregarPergunta() {
+        // Fetch das perguntas do backend via GET /perguntas
+        fetch('http://localhost:3000/perguntas')
+        .then(res => res.json()) // Converte resposta para JSON
+        .then(data => {
+            // Mapeia dados do banco para o formato esperado pelo quiz
+            questions = data.map(p => ({
+                question: p.pergunta,
+                answer: p.alternativas,
+                correctAnswer: p.respostaCorreta
+            }));
+            atual = 0; // Reseta índice para iniciar o quiz do começo
+            mostrarPergunta(); // Chama função que renderiza a pergunta na tela
+        })
+        .catch(err => {
+            alert('Erro ao carregar perguntas do servidor');
+            // Se der erro, usa as perguntas estáticas iniciais
+            mostrarPergunta();
+        });
+    }
+
+    // Função para mostrar a pergunta atual na tela
+    function mostrarPergunta() {
+        telaInicial.appendChild(divQuestions); // Garante que o container está visível
+
+        if (atual === questions.length) { // Se chegou ao fim das perguntas
+            spanQuestion.textContent = '🎉 Fim do quiz!'; // Mostra mensagem de fim
+            divAnswers.innerHTML=''; // Limpa alternativas
+            finishKiss(); // Mostra resultado final
+            return;
+        }
+
+        // Função para exibir resultado final
+        function finishKiss(){
+            const totalQuestion = questions.length; // Total de perguntas
+            const desempenho = Math.floor( acertou * 100 / totalQuestion); // % de acertos
+            let menssagem = "";
+            
+            // Define mensagem de acordo com desempenho
+            switch(true) {
+                case ( desempenho >= 90 ): 
+                    menssagem = 'Excelente :)';
+                    break;
+                case ( desempenho >= 70 ):
+                    menssagem = 'Muito Bom ;)';
+                    break;
+                case ( desempenho >= 50 ):
+                    menssagem = 'Medio';
+                    break;
+                default:
+                    menssagem = 'Precisa Melhorar';
+            }
+
+            // Cria elemento com o texto do resultado
+            const resultado = criarElemento('p','resultado',`Você acertou ${acertou} de  ${totalQuestion} (${desempenho}%). ${menssagem}`);
+            divAnswers.appendChild(resultado);
+            
+            // Cria botão para reiniciar o quiz
+            const reiniciar = criarElemento('button','btn','Reiniciar');
+            divAnswers.appendChild(reiniciar);
+
+            // Evento para reiniciar o quiz
+            reiniciar.addEventListener('click', () => {
+                atual = 0;
+                acertou = 0;
+                errou = 0;
+                divAnswers.innerHTML='';
+                carregarPergunta();
+            });
+
+            // Botão para inserir nova pergunta
+            const inserirPergunta = criarElemento('button','btn','Inserir Pergunta');
+            divAnswers.appendChild(inserirPergunta);
+
+            // Evento para abrir modal de inserir pergunta
+            inserirPergunta.addEventListener('click', () => {
+                divQuestions.remove(); // Remove perguntas da tela
+                
+                const modal = criarElemento('div','modal','');
+                document.body.appendChild(modal);
+                
+                const titulo = criarElemento('h2','','Inserir Nova Pergunta' );
+                modal.appendChild(titulo);
+
+                const letras = ['A','B','C','D'];
+                const alternativa = {};
+
+                // Input para nova pergunta
+                const pergunta = criarElemento('input','','Digite a pergunta');
+                modal.appendChild(pergunta);
+
+                // Inputs para alternativas A, B, C, D
+                letras.forEach( (letra) => {
+                    alternativa[letra] = criarElemento('input','alternativa',`Resposta ${letra}`);
+                    modal.appendChild(alternativa[letra]);
+                })
+
+                // Input para resposta correta
+                const alternativaCorreta = criarElemento('input','','Resposta correta (A, B, C ou D)');
+                modal.appendChild(alternativaCorreta);
+
+                // Botão salvar nova pergunta
+                const botaoSalvar = criarElemento('button','btn','Salvar');
+                modal.appendChild(botaoSalvar);
+                
+                // Evento de salvar nova pergunta no backend via POST
+                botaoSalvar.addEventListener('click', () => {
+                    const objetoResposta = {};
+                    letras.forEach( (letra) => {
+                        objetoResposta[letra] = alternativa[letra].value;
+                    });
+                    
+                    fetch('http://localhost:3000/adicionar-pergunta', { 
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }, 
+                        body: JSON.stringify( {
+                            pergunta: pergunta.value,
+                            alternativas: objetoResposta,
+                            respostaCorreta: alternativaCorreta.value.toUpperCase()
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.mensagem);
+                        modal.remove(); // Remove modal após salvar
+                        atual = 0;
+                        acertou = 0;
+                        errou = 0;
+                        carregarPergunta(); // Recarrega perguntas do backend (incluindo a nova)
+                    })
+                    .catch(() => alert('Erro ao salvar pergunta'));
+                });
+            });
+        }
+        
+        // Pega pergunta atual para exibir
+        const perguntaAtual = questions[atual];
+
+        // Atualiza texto da pergunta
+        spanQuestion.textContent = perguntaAtual.question;
+
+        divAnswers.innerHTML=''; // Limpa alternativas anteriores
+        
+        const letras = ['A', 'B', 'C', 'D'];
+        
+        // Cria botões para cada alternativa
+        letras.forEach((letra) => {
+            const texto = `${letra}: ${perguntaAtual.answer[letra]}`;
+            const botao = criarElemento('button','answers button', texto);
+            botao.dataset.answer = letra;
+            divAnswers.appendChild(botao);
+
+            // Evento clique nos botões das alternativas
+            botao.addEventListener('click', () => {
+                if (letra === perguntaAtual.correctAnswer) {
+                    alert('✅ Resposta correta!');
+                    acertou++;
+                } else {
+                    alert('❌ Resposta errada!');
+                    errou++;
+                }
+                atual++;
+                mostrarPergunta(); // Atualiza pergunta após resposta
+            });
+        });
+    }
+
+    carregarPergunta(); // Inicia carregamento das perguntas do backend
+});
+   
