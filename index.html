@@ -42,7 +42,8 @@
 
        //import {criarElemento} from './criarElemento.js';
 
-            let questions = [
+           let questions = [// Começa vazio e só preenche se vier do backend
+
             { 
                 question : 'Quem descobriu o Brasil?', 
                 answer : {
@@ -104,6 +105,7 @@
             // Função para carregar perguntas do backend e iniciar o quiz
             function carregarPergunta() {
                 // Fetch das perguntas do backend via GET /perguntas
+                //fetch('http://localhost:3000/perguntas')
                 fetch('https://quiss.onrender.com/perguntas')
                 .then(res => res.json()) // Converte resposta para JSON
                 .then(data => {
@@ -216,7 +218,7 @@
                             letras.forEach( (letra) => {
                                 objetoResposta[letra] = alternativa[letra].value;
                             });
-                            
+                            //fetch('http://localhost:3000/perguntas',{
                             fetch('https://quiss.onrender.com/adicionar-pergunta', { 
                                 method: 'POST',
                                 headers: {
