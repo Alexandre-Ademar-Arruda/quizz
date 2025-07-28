@@ -191,18 +191,19 @@
 
                         // Input para nova pergunta
                         const pergunta = criarElemento('input','','Digite a pergunta');
-                        pergunta.addEventListener('focus', () => pergunta.value =  '')
+                        pergunta.addEventListener('focus', () => pergunta.value ='');
                         modal.appendChild(pergunta);
 
                         // Inputs para alternativas A, B, C, D
                         letras.forEach( (letra) => {
                             alternativa[letra] = criarElemento('input','alternativa',`Resposta ${letra}`);
-                            alternativa.addEventListener('focus', () => alternativa[letra].value = '')
+                            alternativa[letra].addEventListener('focus', () => alternativa[letra].value='');
                             modal.appendChild(alternativa[letra]);
                         })
 
                         // Input para resposta correta
                         const alternativaCorreta = criarElemento('input','','Resposta correta (A, B, C ou D)');
+                        alternativaCorreta.addEventListener('focus', () => alternativaCorreta.value = ''); 
                         modal.appendChild(alternativaCorreta);
 
                         // Botão salvar nova pergunta
