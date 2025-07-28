@@ -191,11 +191,13 @@
 
                         // Input para nova pergunta
                         const pergunta = criarElemento('input','','Digite a pergunta');
+                        pergunta.addEventListener('focus', () => pergunta.value =  '')
                         modal.appendChild(pergunta);
 
                         // Inputs para alternativas A, B, C, D
                         letras.forEach( (letra) => {
                             alternativa[letra] = criarElemento('input','alternativa',`Resposta ${letra}`);
+                            alternativa.addEventListener('focus', () => alternativa[letra].value = '')
                             modal.appendChild(alternativa[letra]);
                         })
 
@@ -215,8 +217,6 @@
                             });
                             
                             fetch('https://quiss.onrender.com/adicionar-pergunta', { 
-
-                           //fetch('http://localhost:3000/adicionar-pergunta', { 
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
