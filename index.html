@@ -64,7 +64,7 @@
                 },
                 correctAnswer: 'C'
             }
-        ]; 
+        ];
 
         let atual = 0;   // Índice da pergunta atual
         let acertou = 0; // Contador de acertos
@@ -105,7 +105,6 @@
             // Função para carregar perguntas do backend e iniciar o quiz
             function carregarPergunta() {
                 // Fetch das perguntas do backend via GET /perguntas
-                //fetch('http://localhost:3000/perguntas')
                 fetch('https://quiss.onrender.com/perguntas')
                 .then(res => res.json()) // Converte resposta para JSON
                 .then(data => {
@@ -178,6 +177,11 @@
                     const inserirPergunta = criarElemento('button','btn','Inserir Pergunta');
                     divAnswers.appendChild(inserirPergunta);
 
+                    const botaoRanking = criarElemento('button','btn','Ver Ranking',{
+                        type: 'button'
+                    });
+                    
+
                     // Evento para abrir modal de inserir pergunta
                     inserirPergunta.addEventListener('click', () => {
                         divQuestions.remove(); // Remove perguntas da tela
@@ -187,6 +191,8 @@
                         
                         const titulo = criarElemento('h2','','Inserir Nova Pergunta' );
                         modal.appendChild(titulo);
+
+                        modal.appendChild(botaoRanking);
 
                         const letras = ['A','B','C','D'];
                         const alternativa = {};
@@ -218,7 +224,6 @@
                             letras.forEach( (letra) => {
                                 objetoResposta[letra] = alternativa[letra].value;
                             });
-                            //fetch('http://localhost:3000/perguntas',{
                             fetch('https://quiss.onrender.com/adicionar-pergunta', { 
                                 method: 'POST',
                                 headers: {
